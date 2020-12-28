@@ -1,5 +1,4 @@
 <template>
-
   <div class="shop_container">
     <ul class="shop_list">
       <li class="shop_li border-1px" v-for="(shop,index) in shops" :key="index">
