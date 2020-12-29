@@ -3,7 +3,13 @@ import {
   RECEIVE_CATEGORYS,
   RECEIVE_SHOPS,
   RECEIVE_USER_INFO,
-  RESET_USER_INFO
+  RESET_USER_INFO,
+  RECEIVE_GOODS,
+  RECEIVE_RATINGS,
+  RECEIVE_INFO,
+  INCREMENT_FOOD_COUNT,
+  DECREMENT_FOOD_COUNT,
+  CLEAR_CART
 } from './mutation-types'
 
 import {
@@ -11,7 +17,10 @@ import {
   reqFoodCategorys,
   reqShops,
   reqUserInfo,
-  reqLogout
+  reqLogout,
+  reqShopGoods,
+  reqShopInfo,
+  reqShopRatings
 } from '../api'
 
 export default {
@@ -53,6 +62,39 @@ export default {
     if(result.code === 0){
       commit(RESET_USER_INFO)
     }
+  },
+  async getShopInfo({commit}){
+    const result = await reqShopInfo()
+    if(result.code === 0){
+      const info = result.data
+      commit(RECEIVE_INFO,{info})
+    }
+  },
+  async getShopRatings({commit},callback){
+    const result = await reqShopRatings()
+    if(result.code === 0){
+      const ratings = result.data
+      commit(RECEIVE_RATINGS,{ratings})
+      callback && callback()
+    }
+  },
+  async getShopGoods({commit},callback){
+    const result = await reqShopGoods()
+    if(result.code === 0){
+      const goods = result.data
+      commit(RECEIVE_GOODS,{goods})
+      callback && callback()
+    }
+  },
+  updateFoodCount({commit},{isAdd,food}) {
+    if(isAdd){
+      commit(INCREMENT_FOOD_COUNT,{food})
+    }else {
+      commit(DECREMENT_FOOD_COUNT,{food})
+    }
+  },
+  clearCart({commit}) {
+    commit(CLEAR_CART)
   }
 
 }
