@@ -7,25 +7,18 @@
 
 <script>
   import FooterGuide from "./components/FooterGuide/FooterGuide";
-  // import {reqFoodCategorys,reqAddress} from './api'
-  // import {mapActions,mapState} from 'vuex'
+  import {mapActions} from 'vuex'
     export default {
       name: "App",
       components : {
         FooterGuide
-      }
-/*      mounted() {
-        this.getCategorys()
-        this.getAddress()
-        console.log(this.address)
-        console.log(this.categorys)
-      },*/
-/*      methods : {
-        ...mapActions(['getCategorys','getAddress'])
       },
-      computed: {
-        ...mapState(['address','categorys'])
-      }*/
+      mounted() {
+        this.getUserInfo()
+      },
+      methods : {
+        ...mapActions(['getUserInfo'])
+      }
     }
 </script>
 

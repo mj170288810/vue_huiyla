@@ -41,7 +41,8 @@
               </section>
               <section class="login_message">
                 <input type="text" maxlength="11" placeholder="验证码" v-model="captcha">
-                <img class="get_verification" src="./images/captcha.svg" alt="captcha">
+                <img class="get_verification" src="http://localhost:4000/captcha"
+                     alt="captcha" @click="getCaptcha" ref="captcha">
               </section>
             </section>
           </div>
@@ -59,11 +60,12 @@
 
 <script>
   import AlertTip from "../../components/AlertTip/AlertTip";
+  import {reqSendCode,reqSmsLogin,reqPwdLogin} from '../../api'
     export default {
       name: "Login",
       data (){
         return {
-          loginWay : true,
+          loginWay : false,
           computeTime : 0,
           showPwd : false,
           phone : '',
@@ -84,16 +86,28 @@
         }
       },
       methods :{
-        getCode(){
+        getCaptcha(){
+          this.$refs.captcha.src = 'http://localhost:4000/captcha?time='+Date.now()
+        },
+        async getCode(){
           if(!this.computeTime){
             this.computeTime = 30
-            const intervalID = setInterval(() => {
+            this.intervalID = setInterval(() => {
               this.computeTime--
               if(this.computeTime <= 0){
-                clearInterval(intervalID)
+                clearInterval(this.intervalID)
               }
             },1000)
             //调接口发验证码
+            const result = await reqSendCode(this.phone)
+            if(result.code === 1){
+              this.showAlert(result.msg)
+              if(this.computeTime){
+                this.computeTime = 0
+                clearInterval(this.intervalID)
+                this.intervalID = undefined
+              }
+            }
           }
         },
         closeTip(){
@@ -104,28 +118,50 @@
           this.alertShow = true
           this.alertText =alertText
         },
-        login(){
+        async login(){
+          let result
           if(this.loginWay){
             const {rightPhone,phone,code} = this
             if(!rightPhone){
               //手机号不正确
               this.showAlert('手机号不正确')
+              return
             }else if(!/^\d{6}$/.test(code)){
               //验证码必须是6位数
               this.showAlert('验证码必须是6位数')
+              return
             }
+            result = await reqSmsLogin(phone,code)
           }else {
             const {name,pwd,captcha} = this
             if(!name){
               //用户名必须指定
               this.showAlert('用户名必须指定')
+              return
             }else if(!pwd){
               //密码必须指定
               this.showAlert('密码必须指定')
+              return
             }else if(!captcha){
               //验证码必须指定
               this.showAlert('验证码必须指定')
+              return
             }
+            result = await reqPwdLogin({name,pwd,captcha})
+          }
+          if(this.computeTime){
+            this.computeTime = 0
+            clearInterval(this.intervalID)
+            this.intervalID = undefined
+          }
+          if(result.code === 0){
+            const user = result.data
+            this.$store.dispatch('recordUser',user)
+            this.$router.replace('/profile')
+          }else {
+            this.getCaptcha()
+            const msg = result.msg
+            this.showAlert(msg)
           }
         }
       }
