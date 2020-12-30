@@ -87,7 +87,7 @@
           }
       },
       computed :{
-          ...mapState(['info','ratings']),
+        ...mapState(['info','ratings']),
         ...mapGetters(['positiveSize']),
         filterRatings (){
             const {ratings,onlyShowText,selectType} = this
@@ -213,7 +213,7 @@
           color: rgb(77, 85, 93)
           background: rgba(77, 85, 93, 0.2)
           &.active
-            background: $green
+            background: green
             color: #fff
           .count
             margin-left: 2px
@@ -226,7 +226,7 @@
         font-size: 0
         &.on
           .icon-check_circle
-            color: $green
+            color: green
         .icon-check_circle
           display: inline-block
           vertical-align: top
